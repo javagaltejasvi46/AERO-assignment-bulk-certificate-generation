@@ -74,6 +74,15 @@ pytest -v
 
 This runs the full test suite. Tests use a separate SQLite database so they don't mess with your actual data.
 
+### Deploy to Render
+
+This repository includes a `render.yaml` blueprint and a production `Dockerfile`:
+
+1. In [Render](https://render.com), click **New +** &rarr; **Blueprint** (or **Web Service**).
+2. Connect this repository: `https://github.com/javagaltejasvi46/AERO-assignment-bulk-certificate-generation`.
+3. Render automatically reads `render.yaml` with the configured build command, start command, and health check path (`/api/health`).
+4. Click **Apply** / **Create Web Service** to deploy.
+
 ## API Usage
 
 ### 1. Submit a Certificate Generation Request
