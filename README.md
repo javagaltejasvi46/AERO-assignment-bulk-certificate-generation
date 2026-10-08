@@ -2,6 +2,9 @@
 
 A backend API for generating certificates in bulk. Built with FastAPI, SQLAlchemy, and ReportLab.
 
+- 🚀 **Live Application**: [https://aero-assignment-bulk-certificate.onrender.com](https://aero-assignment-bulk-certificate.onrender.com)
+- 📖 **Live API Docs (Swagger)**: [https://aero-assignment-bulk-certificate.onrender.com/docs](https://aero-assignment-bulk-certificate.onrender.com/docs)
+
 Submit a list of recipients, the system generates PDF certificates in the background, and you can track progress and download the results.
 
 ## Quick Start
@@ -49,7 +52,7 @@ The API will be available at `http://localhost:8000`.
 
 Here is how to test the generation process in the browser:
 
-1. Open `http://localhost:8000/` or `http://localhost:8000/ui` in your browser.
+1. Open `http://localhost:8000/` or `http://localhost:8000/ui` in your browser (or use the live hosted app at `https://aero-assignment-bulk-certificate.onrender.com`).
 2. In the **Generator Studio** tab, enter the **Course or Award Title** and **Issuing Organization** (or keep the defaults).
 3. Choose your input method:
    - **Quick Presets**: Click any sample button (e.g. *10 Students Batch* or *3 Dev Cohort*) to immediately populate the list.
