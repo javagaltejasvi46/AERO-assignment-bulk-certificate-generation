@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: bulk-certificate-generator
+    ports:
+      - "8000:8000"
+    volumes:
+      - certs_data:/app/generated_certs
+      - db_data:/app/data
+    environment:
+      - PORT=8000
+      - DATABASE_URL=sqlite:////app/data/certificates.db
+      - CERTS_DIR=/app/generated_certs
+    restart: unless-stopped
+
+volumes:
+  certs_data:
+  db_data:

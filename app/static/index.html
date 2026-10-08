@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bulk Certificate Generator</title>
+  <meta name="description" content="Generate and download certificates in bulk with background progress tracking." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body class="liquid-glass-theme">
+  <!-- Background Animated Liquid Mesh Orbs -->
+  <div class="liquid-mesh-background" aria-hidden="true">
+    <div class="liquid-orb orb-1"></div>
+    <div class="liquid-orb orb-2"></div>
+    <div class="liquid-orb orb-3"></div>
+    <div class="liquid-orb orb-4"></div>
+    <div class="glass-grid-overlay"></div>
+  </div>
+
+  <!-- App Wrapper -->
+  <div class="app-container">
+    <!-- Glass Header Navigation -->
+    <header class="glass-header">
+      <div class="brand-group">
+        <div class="brand-logo-glass">
+          <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div class="brand-glow"></div>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title-wrap">
+            <span class="brand-name">CertGenerator</span>
+          </div>
+          <p class="brand-sub">Bulk Certificate Generation & Verification</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="glass-nav-tabs">
+        <button class="nav-tab-btn active" data-tab="create" id="nav-tab-create">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tab-icon">
+            <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
+          </svg>
+          <span>Generator Studio</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="monitor" id="nav-tab-monitor">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tab-icon">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span>Live Tracker</span>
+          <span class="tab-indicator-dot" id="live-indicator-dot"></span>
+        </button>
+        <button class="nav-tab-btn" data-tab="history" id="nav-tab-history">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tab-icon">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+          <span>Job Archives</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="api" id="nav-tab-api">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tab-icon">
+            <polyline points="16 18 22 12 16 6"/>
+            <polyline points="8 6 2 12 8 18"/>
+          </svg>
+          <span>API & Docs</span>
+        </button>
+      </nav>
+
+      <!-- System Status indicator -->
+      <div class="header-status-group">
+        <div class="server-pulse-pill" id="server-status-pill">
+          <span class="status-ping"></span>
+          <span class="status-label" id="server-status-text">Backend Connected</span>
+        </div>
+        <a href="/docs" target="_blank" rel="noopener" class="glass-btn-sm" title="Interactive OpenAPI Docs">
+          <span>Swagger Docs</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mini-icon">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Content Dynamic Views -->
+    <main class="glass-main-area">
+
+      <!-- ============================================== -->
+      <!-- VIEW 1: GENERATOR STUDIO                       -->
+      <!-- ============================================== -->
+      <section class="tab-view active" id="view-create">
+        <div class="studio-grid">
+          
+          <!-- Left Column: Form & Recipients Config -->
+          <div class="studio-form-column">
+            
+            <!-- Metadata Card -->
+            <div class="liquid-card glass-panel">
+              <div class="card-header">
+                <div class="card-icon-badge cyan-glow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <polyline points="10 9 9 9 8 9"/>
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="card-title">Certificate Metadata</h2>
+                  <p class="card-subtitle">Set the program details and issuing organization</p>
+                </div>
+              </div>
+
+              <div class="form-row-2col">
+                <div class="form-group">
+                  <label for="course-name-input" class="glass-label">
+                    <span>Course or Award Title</span>
+                    <span class="required-star">*</span>
+                  </label>
+                  <div class="input-glass-wrap">
+                    <input type="text" id="course-name-input" class="glass-input" placeholder="e.g. Advanced AI & Cloud Engineering" value="Certificate of Completion" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="issuer-name-input" class="glass-label">
+                    <span>Issuing Organization</span>
+                    <span class="required-star">*</span>
+                  </label>
+                  <div class="input-glass-wrap">
+                    <input type="text" id="issuer-name-input" class="glass-input" placeholder="e.g. Acme Tech Institute" value="Global Tech Academy" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recipient Input Mode Card -->
+            <div class="liquid-card glass-panel recipient-card">
+              <div class="card-header space-between">
+                <div class="flex-align-center">
+                  <div class="card-icon-badge purple-glow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                      <circle cx="9" cy="7" r="4"/>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 class="card-title">Recipients List</h2>
+                    <p class="card-subtitle"><span id="recipient-count-badge" class="highlight-count">3 recipients</span> ready for batch processing</p>
+                  </div>
+                </div>
+
+                <!-- Input mode toggles -->
+                <div class="segmented-control">
+                  <button type="button" class="segment-btn active" id="btn-mode-table">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="micro-icon"><path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+                    <span>Table Builder</span>
+                  </button>
+                  <button type="button" class="segment-btn" id="btn-mode-bulk">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="micro-icon"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                    <span>CSV / Paste</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Quick Presets Bar -->
+              <div class="preset-toolbar">
+                <span class="preset-label">Quick Samples:</span>
+                <button type="button" class="glass-chip-btn" id="load-sample-devs">
+                  <span class="chip-spark">✨</span> 3 Dev Cohort
+                </button>
+                <button type="button" class="glass-chip-btn" id="load-sample-bootcamp">
+                  <span class="chip-spark">🚀</span> 10 Students Batch
+                </button>
+                <button type="button" class="glass-chip-btn" id="load-sample-edge">
+                  <span class="chip-spark">🛡️</span> Edge Cases & Accents
+                </button>
+                <button type="button" class="glass-chip-btn text-danger" id="clear-all-recipients">
+                  <span>Clear</span>
+                </button>
+              </div>
+
+              <!-- MODE A: Dynamic Table Builder -->
+              <div class="input-mode-panel" id="panel-mode-table">
+                <div class="glass-table-wrapper">
+                  <table class="glass-table" id="recipients-table">
+                    <thead>
+                      <tr>
+                        <th style="width: 45px;">#</th>
+                        <th>Full Name <span class="required-star">*</span></th>
+                        <th>Email Address (Optional)</th>
+                        <th style="width: 60px; text-align: center;">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="recipients-table-body">
+                      <!-- Rows injected dynamically via JS -->
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="table-actions-row">
+                  <button type="button" class="glass-btn-secondary" id="btn-add-row">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mini-icon"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span>Add Recipient</span>
+                  </button>
+                  <span class="table-hint">Max 500 recipients per batch job.</span>
+                </div>
+              </div>
+
+              <!-- MODE B: Bulk Paste / CSV Area -->
+              <div class="input-mode-panel hidden" id="panel-mode-bulk">
+                <div class="bulk-instructions">
+                  <p>Paste lines formatted as <code>Name, email@domain.com</code> or just <code>Name</code> (one per line):</p>
+                </div>
+                <div class="textarea-glass-wrap">
+                  <textarea id="bulk-textarea" class="glass-textarea" rows="7" placeholder="Alice Johnson, alice@example.com&#10;Bob Smith, bob@example.com&#10;Charlie Vance&#10;Dr. Elena Rostova, elena@research.org"></textarea>
+                </div>
+                <div class="bulk-actions-bar">
+                  <button type="button" class="glass-btn-secondary" id="btn-parse-bulk">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mini-icon"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    <span>Parse into Table</span>
+                  </button>
+                  <label class="glass-file-upload-btn">
+                    <input type="file" id="csv-file-input" accept=".csv, .txt" style="display: none;" />
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mini-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <span>Upload CSV</span>
+                  </label>
+                  <button type="button" class="glass-btn-secondary" id="btn-download-sample-csv" title="Download sample CSV template">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mini-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span>Sample CSV</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Submit Action Button -->
+              <div class="submit-job-container">
+                <button type="button" class="liquid-glow-btn" id="btn-submit-job">
+                  <div class="btn-sheen"></div>
+                  <div class="btn-content">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
+                    <span id="submit-btn-text">Generate Certificates Now</span>
+                  </div>
+                </button>
+                <div class="submit-note">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="micro-icon"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  <span>Generates asynchronously via background worker threads. No timeouts.</span>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Right Column: Interactive Live Certificate Mockup Preview -->
+          <div class="studio-preview-column">
+            <div class="liquid-card glass-panel sticky-card">
+              <div class="card-header">
+                <div class="card-icon-badge amber-glow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8" r="7"/>
+                    <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="card-title">Live Template Preview</h3>
+                  <p class="card-subtitle">Real-time vector layout preview before generation</p>
+                </div>
+              </div>
+
+              <!-- Certificate Mockup Visual -->
+              <div class="cert-mockup-frame">
+                <div class="cert-mockup-inner">
+                  <div class="cert-decor-corner tl"></div>
+                  <div class="cert-decor-corner tr"></div>
+                  <div class="cert-decor-corner bl"></div>
+                  <div class="cert-decor-corner br"></div>
+                  
+                  <div class="cert-preview-issuer" id="preview-issuer-text">GLOBAL TECH ACADEMY</div>
+                  <div class="cert-preview-header">CERTIFICATE OF ACHIEVEMENT</div>
+                  <div class="cert-preview-sub">THIS PROUDLY CERTIFIES THAT</div>
+                  
+                  <div class="cert-preview-name" id="preview-recipient-name">Alice Johnson</div>
+                  <div class="cert-preview-rule"></div>
+
+                  <div class="cert-preview-desc">has successfully mastered all prescribed coursework and criteria for</div>
+                  <div class="cert-preview-course" id="preview-course-text">Certificate of Completion</div>
+
+                  <div class="cert-preview-footer">
+                    <div class="cert-preview-signature">
+                      <div class="sig-line"></div>
+                      <span class="sig-title">Authorized Registrar</span>
+                    </div>
+
+                    <div class="cert-preview-seal">
+                      <div class="seal-inner">
+                        <span class="seal-star">★</span>
+                        <span class="seal-text">OFFICIAL</span>
+                        <span class="seal-star">★</span>
+                      </div>
+                    </div>
+
+                    <div class="cert-preview-meta">
+                      <span class="cert-id-preview" id="preview-cert-id">ID: CERT-PREVIEW</span>
+                      <span class="cert-date-preview" id="preview-date">Date: Today</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="preview-helper-box">
+                <div class="helper-item">
+                  <span class="helper-bullet">•</span>
+                  <span>ReportLab PDF generation</span>
+                </div>
+                <div class="helper-item">
+                  <span class="helper-bullet">•</span>
+                  <span>Unique certificate IDs</span>
+                </div>
+                <div class="helper-item">
+                  <span class="helper-bullet">•</span>
+                  <span>Individual PDF or ZIP batch download</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW 2: LIVE JOB TRACKER & MONITOR             -->
+      <!-- ============================================== -->
+      <section class="tab-view" id="view-monitor">
+        <div class="monitor-container">
+          
+          <!-- Job Overview Glass Banner -->
+          <div class="liquid-card glass-panel banner-panel">
+            <div class="monitor-banner-header">
+              <div class="banner-title-group">
+                <div class="job-id-pill-wrap">
+                  <span class="label-dim">Active Job:</span>
+                  <code class="job-id-code" id="monitor-job-id">No active job selected</code>
+                  <button type="button" class="copy-btn" id="btn-copy-job-id" title="Copy Job ID">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="micro-icon"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  </button>
+                  <div class="job-lookup-inline">
+                    <input type="text" id="manual-job-id-input" class="glass-input-micro" placeholder="Or enter Job ID..." maxlength="12" />
+                    <button type="button" class="glass-btn-micro" id="btn-load-manual-job" title="Track this Job ID">Load</button>
+                  </div>
+                </div>
+                <h2 class="banner-job-title" id="monitor-job-course">Waiting for job...</h2>
+                <p class="banner-job-issuer" id="monitor-job-issuer">Issuer: —</p>
+              </div>
+
+              <!-- Status Badge & Controls -->
+              <div class="banner-actions-group">
+                <div class="status-badge-lg" id="monitor-status-badge">
+                  <span class="badge-dot"></span>
+                  <span class="badge-text" id="monitor-status-text">IDLE</span>
+                </div>
+                
+                <div class="flex-row-gap">
+                  <button type="button" class="glass-btn-secondary" id="btn-poll-refresh" title="Refresh Current Job Status">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mini-icon" id="refresh-spin-icon"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                    <span>Refresh</span>
+                  </button>
+                  <label class="auto-refresh-toggle" title="Poll every 1.5 seconds while processing">
+                    <input type="checkbox" id="chk-auto-poll" checked />
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Live Sync</span>
+                  </label>
+                  <button type="button" class="liquid-glow-btn btn-sm" id="btn-download-zip" disabled>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mini-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span>Download All (ZIP)</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Liquid Dynamic Progress Bar -->
+            <div class="progress-section">
+              <div class="progress-labels">
+                <span class="progress-label-text" id="progress-status-desc">Ready to generate</span>
+                <span class="progress-percent" id="progress-percent-val">0%</span>
+              </div>
+              <div class="liquid-progress-track">
+                <div class="liquid-progress-fill" id="liquid-progress-fill" style="width: 0%;">
+                  <div class="liquid-wave"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats Metric Cards -->
+            <div class="metrics-grid">
+              <div class="metric-card">
+                <div class="metric-icon blue">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div>
+                  <div class="metric-number" id="metric-total">0</div>
+                  <div class="metric-name">Total Queued</div>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon green">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <div>
+                  <div class="metric-number text-success" id="metric-completed">0</div>
+                  <div class="metric-name">Completed</div>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon red">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                </div>
+                <div>
+                  <div class="metric-number text-danger" id="metric-failed">0</div>
+                  <div class="metric-name">Failures</div>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon purple">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+                </div>
+                <div>
+                  <div class="metric-number text-accent" id="metric-rate">0%</div>
+                  <div class="metric-name">Success Rate</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Individual Certificates Table Glass Card -->
+          <div class="liquid-card glass-panel">
+            <div class="table-header-bar">
+              <div class="table-title-group">
+                <h3 class="card-title">Generated Certificates</h3>
+                <span class="certs-count-pill" id="certs-count-pill">0 items</span>
+              </div>
+
+              <!-- Filter tabs & Search -->
+              <div class="table-filter-group">
+                <div class="filter-pills">
+                  <button type="button" class="filter-pill active" data-filter="all">All</button>
+                  <button type="button" class="filter-pill" data-filter="success">Successful</button>
+                  <button type="button" class="filter-pill" data-filter="failed">Failed</button>
+                  <button type="button" class="filter-pill" data-filter="pending">Pending</button>
+                </div>
+
+                <div class="search-glass-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input type="text" id="cert-search-input" class="glass-search" placeholder="Search name or ID..." />
+                </div>
+              </div>
+            </div>
+
+            <!-- Certificates List Table -->
+            <div class="glass-table-wrapper">
+              <table class="glass-table" id="certs-data-table">
+                <thead>
+                  <tr>
+                    <th>Certificate ID</th>
+                    <th>Recipient</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                    <th style="text-align: right;">Download & Preview</th>
+                  </tr>
+                </thead>
+                <tbody id="certs-data-tbody">
+                  <tr class="empty-state-row">
+                    <td colspan="6">
+                      <div class="empty-table-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        <p class="empty-title">No Job Selected or Generated Yet</p>
+                        <p class="empty-sub">Submit a batch from Generator Studio or select a past job from Job Archives.</p>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW 3: JOB ARCHIVES & HISTORY                 -->
+      <!-- ============================================== -->
+      <section class="tab-view" id="view-history">
+        <div class="liquid-card glass-panel">
+          <div class="card-header space-between">
+            <div class="flex-align-center">
+              <div class="card-icon-badge blue-glow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="21 8 21 21 3 21 3 8"/>
+                  <rect x="1" y="3" width="22" height="5"/>
+                  <line x1="10" y1="12" x2="14" y2="12"/>
+                </svg>
+              </div>
+              <div>
+                <h2 class="card-title">Job Archives & Logs</h2>
+                <p class="card-subtitle">All past certificate generation batches stored in SQLite</p>
+              </div>
+            </div>
+
+            <div class="flex-row-gap">
+              <button type="button" class="glass-btn-secondary" id="btn-refresh-history">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mini-icon"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                <span>Refresh List</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="glass-table-wrapper">
+            <table class="glass-table" id="jobs-history-table">
+              <thead>
+                <tr>
+                  <th>Job ID</th>
+                  <th>Course / Program</th>
+                  <th>Issuer</th>
+                  <th>Certificates</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="jobs-history-tbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW 4: API & DOCUMENTATION                    -->
+      <!-- ============================================== -->
+      <section class="tab-view" id="view-api">
+        <div class="api-docs-grid">
+          
+          <div class="liquid-card glass-panel">
+            <div class="card-header">
+              <div class="card-icon-badge cyan-glow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="16 18 22 12 16 6"/>
+                  <polyline points="8 6 2 12 8 18"/>
+                </svg>
+              </div>
+              <div>
+                <h2 class="card-title">API Endpoints Reference</h2>
+                <p class="card-subtitle">RESTful specification implemented in FastAPI</p>
+              </div>
+            </div>
+
+            <div class="api-endpoint-list">
+              
+              <div class="endpoint-item">
+                <div class="endpoint-badge-row">
+                  <span class="http-badge post">POST</span>
+                  <code class="endpoint-path">/api/jobs</code>
+                  <span class="status-code-tag">202 Accepted</span>
+                </div>
+                <p class="endpoint-desc">Accepts a bulk recipient list, validates input, and spawns an asynchronous worker thread.</p>
+                <pre class="code-glass"><code>curl -X POST http://localhost:8000/api/jobs \
+  -H "Content-Type: application/json" \
+  -d '{
+    "recipients": [{"name": "Alice Johnson", "email": "alice@domain.com"}],
+    "course_name": "AI Systems",
+    "issuer_name": "Tech Academy"
+  }'</code></pre>
+              </div>
+
+              <div class="endpoint-item">
+                <div class="endpoint-badge-row">
+                  <span class="http-badge get">GET</span>
+                  <code class="endpoint-path">/api/jobs/{job_id}</code>
+                  <span class="status-code-tag">200 OK</span>
+                </div>
+                <p class="endpoint-desc">Returns real-time progress metrics (completed, failed, total) and nested certificate details.</p>
+              </div>
+
+              <div class="endpoint-item">
+                <div class="endpoint-badge-row">
+                  <span class="http-badge get">GET</span>
+                  <code class="endpoint-path">/api/jobs/{job_id}/download</code>
+                  <span class="status-code-tag">200 Streaming ZIP</span>
+                </div>
+                <p class="endpoint-desc">Dynamically compresses all generated PDFs into an in-memory ZIP stream for bulk download.</p>
+              </div>
+
+              <div class="endpoint-item">
+                <div class="endpoint-badge-row">
+                  <span class="http-badge get">GET</span>
+                  <code class="endpoint-path">/api/certificates/{cert_id}/download</code>
+                  <span class="status-code-tag">200 PDF File</span>
+                </div>
+                <p class="endpoint-desc">Returns the standalone ReportLab PDF for an individual certificate.</p>
+              </div>
+
+              <div class="endpoint-item">
+                <div class="endpoint-badge-row">
+                  <span class="http-badge get">GET</span>
+                  <code class="endpoint-path">/api/jobs</code>
+                  <span class="status-code-tag">200 OK</span>
+                </div>
+                <p class="endpoint-desc">List all historical jobs with offset/limit pagination.</p>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="liquid-card glass-panel">
+            <div class="card-header">
+              <div class="card-icon-badge purple-glow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="card-title">Technical Details</h3>
+                <p class="card-subtitle">Implementation and tech stack overview</p>
+              </div>
+            </div>
+
+            <div class="tech-specs-box">
+              <div class="spec-row">
+                <span class="spec-label">Execution:</span>
+                <span class="spec-value">Background worker threads</span>
+              </div>
+              <div class="spec-row">
+                <span class="spec-label">Database:</span>
+                <span class="spec-value">SQLite with SQLAlchemy ORM</span>
+              </div>
+              <div class="spec-row">
+                <span class="spec-label">PDF Generator:</span>
+                <span class="spec-value">ReportLab</span>
+              </div>
+              <div class="spec-row">
+                <span class="spec-label">Error Handling:</span>
+                <span class="spec-value">Per-certificate try/catch handling</span>
+              </div>
+              <div class="spec-row">
+                <span class="spec-label">Tests:</span>
+                <span class="spec-value">Pytest (25 test cases)</span>
+              </div>
+            </div>
+
+            <div class="docs-quick-links">
+              <a href="/docs" target="_blank" rel="noopener" class="glass-link-card">
+                <div class="glc-icon">📘</div>
+                <div>
+                  <strong>Interactive Swagger UI</strong>
+                  <p>Execute live API calls with auto-generated schemas</p>
+                </div>
+              </a>
+              <a href="/redoc" target="_blank" rel="noopener" class="glass-link-card">
+                <div class="glc-icon">📕</div>
+                <div>
+                  <strong>ReDoc Documentation</strong>
+                  <p>Clean, readable API specification documentation</p>
+                </div>
+              </a>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- PDF Preview Modal (Liquid Glass) -->
+  <div class="glass-modal-backdrop hidden" id="pdf-preview-modal">
+    <div class="glass-modal-container">
+      <div class="glass-modal-header">
+        <div class="flex-align-center">
+          <div class="card-icon-badge amber-glow" style="margin-right: 12px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mini-icon">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title" id="modal-cert-title">Certificate Preview</h3>
+            <p class="modal-sub" id="modal-cert-id">ID: cert_xxxx</p>
+          </div>
+        </div>
+
+        <div class="flex-row-gap">
+          <a href="#" id="modal-direct-download" class="liquid-glow-btn btn-sm" download>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mini-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Download PDF</span>
+          </a>
+          <button type="button" class="glass-close-btn" id="btn-close-modal" aria-label="Close modal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="micro-icon"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="glass-modal-body">
+        <iframe id="pdf-preview-iframe" src="about:blank" title="Certificate PDF Viewer"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Glass Toast Notification Host -->
+  <div class="glass-toast-host" id="toast-host" aria-live="polite"></div>
+
+  <!-- App Logic -->
+  <script src="/static/app.js"></script>
+</body>
+</html>

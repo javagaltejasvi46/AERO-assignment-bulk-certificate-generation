@@ -1,0 +1,30 @@
+# python stuff
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# virtual env
+venv/
+env/
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# project specific
+*.db
+generated_certs/
+decisions.md
+.pytest_cache/
+
+# OS junk
+.DS_Store
+Thumbs.db
