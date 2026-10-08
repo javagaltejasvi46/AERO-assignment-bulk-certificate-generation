@@ -4,6 +4,7 @@ Certificate PDF generation service using ReportLab canvas drawing.
 
 import os
 import math
+import textwrap
 from datetime import datetime
 
 from reportlab.lib.pagesizes import landscape, A4
@@ -146,7 +147,8 @@ def generate_certificate_pdf(
     recipient_name: str,
     course_name: str = "Certificate of Completion",
     issuer_name: str = "Organization",
-    cert_id: str = "000",
+    description: str = "has successfully mastered all prescribed coursework and criteria for",
+    cert_id: str = "000000",
 ) -> str:
     """Generates a certificate PDF and returns the file path."""
     safe_name = "".join(c if c.isalnum() or c in (" ", "-", "_") else "" for c in recipient_name)
@@ -203,15 +205,25 @@ def generate_certificate_pdf(
     c.setLineWidth(0.5)
     c.line(center_x - 2 * inch, name_line_y, center_x + 2 * inch, name_line_y)
 
-    # -- "for successfully completing" --
-    c.setFont("Helvetica", 11)
-    c.setFillColor(HexColor("#777777"))
-    c.drawCentredString(center_x, page_height - 4.2 * inch, "for successfully completing")
+    # -- certificate description / achievement statement --
+    desc_clean = (description or "has successfully mastered all prescribed coursework and criteria for").strip()
+    desc_lines = textwrap.wrap(desc_clean, width=75)
+    if not desc_lines:
+        desc_lines = ["has successfully mastered all prescribed coursework and criteria for"]
 
-    # -- course name --
+    c.setFont("Helvetica", 11)
+    c.setFillColor(HexColor("#666666"))
+
+    desc_start_y = page_height - 4.18 * inch if len(desc_lines) <= 1 else page_height - 4.10 * inch
+    line_step = 14
+    for i, d_line in enumerate(desc_lines[:3]):
+        c.drawCentredString(center_x, desc_start_y - (i * line_step), d_line)
+
+    # -- course name / award title --
+    course_y = desc_start_y - (len(desc_lines[:3]) * line_step) - 16
     c.setFont("Helvetica-Bold", 16)
     c.setFillColor(HexColor("#2980b9"))
-    c.drawCentredString(center_x, page_height - 4.6 * inch, course_name)
+    c.drawCentredString(center_x, course_y, course_name)
 
     # -- date and issuer at the bottom --
     today = datetime.now().strftime("%B %d, %Y")

@@ -14,7 +14,7 @@ from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
-from app.database import Base, engine, get_db, get_session_factory
+from app.database import Base, engine, get_db, get_session_factory, init_db
 from app.models import GenerationJob, Certificate, CertificateStatus
 from app.schemas import (
     JobCreateRequest,
@@ -33,8 +33,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# initialize database tables
-Base.metadata.create_all(bind=engine)
+# initialize database tables & migrations
+init_db()
 
 app = FastAPI(
     title="Bulk Certificate Generator",
@@ -102,6 +102,7 @@ def create_generation_job(request: JobCreateRequest, db: Session = Depends(get_d
         recipients=recipients,
         course_name=request.course_name,
         issuer_name=request.issuer_name,
+        description=request.description,
     )
 
     # Process generation in a background thread to prevent blocking

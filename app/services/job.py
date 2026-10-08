@@ -13,13 +13,20 @@ from app.services.certificate import generate_certificate_pdf
 logger = logging.getLogger(__name__)
 
 
-def create_job(db: Session, recipients: list[dict], course_name: str, issuer_name: str) -> GenerationJob:
+def create_job(
+    db: Session,
+    recipients: list[dict],
+    course_name: str,
+    issuer_name: str,
+    description: str | None = None,
+) -> GenerationJob:
     """Creates a new generation job and initial certificate records in pending state."""
     job = GenerationJob(
         status=JobStatus.PENDING.value,
         total_certificates=len(recipients),
         course_name=course_name,
         issuer_name=issuer_name,
+        description=description or "has successfully mastered all prescribed coursework and criteria for",
     )
     db.add(job)
     db.flush()
@@ -61,6 +68,7 @@ def process_generation_job(job_id: str, db_session_factory):
                     recipient_name=cert.recipient_name,
                     course_name=job.course_name or "Certificate of Completion",
                     issuer_name=job.issuer_name or "Organization",
+                    description=job.description or "has successfully mastered all prescribed coursework and criteria for",
                     cert_id=cert.id,
                 )
                 cert.status = CertificateStatus.SUCCESS.value

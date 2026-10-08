@@ -46,6 +46,7 @@ class GenerationJob(Base):
     # optional metadata the client can attach to the job
     course_name = Column(String(255), nullable=True)
     issuer_name = Column(String(255), nullable=True)
+    description = Column(Text, nullable=True)
 
     certificates = relationship(
         "Certificate", back_populates="job", cascade="all, delete-orphan"

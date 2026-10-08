@@ -42,6 +42,22 @@ class Base(DeclarativeBase):
     pass
 
 
+def init_db():
+    """Initializes tables and performs lightweight migrations for existing databases."""
+    Base.metadata.create_all(bind=engine)
+    try:
+        from sqlalchemy import inspect, text
+        inspector = inspect(engine)
+        tables = inspector.get_table_names()
+        if "generation_jobs" in tables:
+            columns = [c["name"] for c in inspector.get_columns("generation_jobs")]
+            if "description" not in columns:
+                with engine.begin() as conn:
+                    conn.execute(text("ALTER TABLE generation_jobs ADD COLUMN description TEXT;"))
+    except Exception:
+        pass
+
+
 def get_db():
     """
     Dependency that hands out DB sessions.

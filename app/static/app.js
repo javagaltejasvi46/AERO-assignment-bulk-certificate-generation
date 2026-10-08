@@ -28,6 +28,7 @@ const DOM = {
   // Metadata Inputs
   courseInput: document.getElementById("course-name-input"),
   issuerInput: document.getElementById("issuer-name-input"),
+  descInput: document.getElementById("cert-desc-input"),
 
   // Recipient Controls
   recipientCountBadge: document.getElementById("recipient-count-badge"),
@@ -55,6 +56,7 @@ const DOM = {
   // Preview Card
   previewIssuerText: document.getElementById("preview-issuer-text"),
   previewCourseText: document.getElementById("preview-course-text"),
+  previewDescText: document.getElementById("preview-desc-text"),
   previewRecipientName: document.getElementById("preview-recipient-name"),
   previewDate: document.getElementById("preview-date"),
   previewCertId: document.getElementById("preview-cert-id"),
@@ -66,6 +68,7 @@ const DOM = {
   btnLoadManualJob: document.getElementById("btn-load-manual-job"),
   monitorJobCourse: document.getElementById("monitor-job-course"),
   monitorJobIssuer: document.getElementById("monitor-job-issuer"),
+  monitorJobDesc: document.getElementById("monitor-job-desc"),
   monitorStatusBadge: document.getElementById("monitor-status-badge"),
   monitorStatusText: document.getElementById("monitor-status-text"),
   btnPollRefresh: document.getElementById("btn-poll-refresh"),
@@ -131,6 +134,7 @@ function setupEventListeners() {
   // Metadata real-time preview updates
   DOM.courseInput.addEventListener("input", updateLivePreview);
   DOM.issuerInput.addEventListener("input", updateLivePreview);
+  if (DOM.descInput) DOM.descInput.addEventListener("input", updateLivePreview);
 
   // Input Mode Toggle
   DOM.btnModeTable.addEventListener("click", () => setInputMode("table"));
@@ -466,9 +470,13 @@ function downloadSampleCsv() {
 function updateLivePreview() {
   const course = DOM.courseInput.value.trim() || "Certificate of Completion";
   const issuer = DOM.issuerInput.value.trim() || "Global Tech Academy";
+  const desc = DOM.descInput
+    ? (DOM.descInput.value.trim() || "has successfully mastered all prescribed coursework and criteria for")
+    : "has successfully mastered all prescribed coursework and criteria for";
 
   DOM.previewCourseText.textContent = course;
   DOM.previewIssuerText.textContent = issuer.toUpperCase();
+  if (DOM.previewDescText) DOM.previewDescText.textContent = desc;
 
   const firstValid = state.recipients.find((r) => r.name && r.name.trim() !== "");
   DOM.previewRecipientName.textContent = firstValid ? firstValid.name : "Recipient Full Name";
@@ -517,6 +525,9 @@ async function submitGenerationJob() {
     })),
     course_name: DOM.courseInput.value.trim() || "Certificate of Completion",
     issuer_name: DOM.issuerInput.value.trim() || "Organization",
+    description: DOM.descInput && DOM.descInput.value.trim()
+      ? DOM.descInput.value.trim()
+      : "has successfully mastered all prescribed coursework and criteria for",
   };
 
   setSubmittingState(true);
@@ -667,6 +678,9 @@ function updateMonitorView(job) {
   DOM.monitorJobId.textContent = job.id;
   DOM.monitorJobCourse.textContent = job.course_name || "Untitled Certificate";
   DOM.monitorJobIssuer.textContent = `Issuer: ${job.issuer_name || "—"}`;
+  if (DOM.monitorJobDesc) {
+    DOM.monitorJobDesc.textContent = job.description || "";
+  }
 
   // Status Badge
   DOM.monitorStatusBadge.className = `status-badge-lg status-${job.status}`;

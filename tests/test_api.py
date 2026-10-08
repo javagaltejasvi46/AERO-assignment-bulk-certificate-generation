@@ -386,3 +386,53 @@ def test_pdf_generation_special_characters():
     )
     assert os.path.exists(path)
     os.remove(path)
+
+
+def test_create_job_with_custom_description(client):
+    """ensure custom description is accepted and saved on the job"""
+    custom_desc = "has demonstrated outstanding leadership and expertise in"
+    resp = client.post("/api/jobs", json={
+        "recipients": [{"name": "Dana Scully"}],
+        "course_name": "Forensic Investigation",
+        "issuer_name": "FBI Academy",
+        "description": custom_desc,
+    })
+    assert resp.status_code == 202
+    job_id = resp.json()["job_id"]
+
+    job_resp = client.get(f"/api/jobs/{job_id}")
+    assert job_resp.status_code == 200
+    data = job_resp.json()
+    assert data["description"] == custom_desc
+
+
+def test_pdf_generation_with_custom_description():
+    """PDF generation accepts and renders custom certificate descriptions"""
+    path = generate_certificate_pdf(
+        recipient_name="Fox Mulder",
+        course_name="X-Files Investigation",
+        issuer_name="FBI Academy",
+        description="has successfully mastered all paranormal case research and criteria for",
+        cert_id="test003",
+    )
+    assert os.path.exists(path)
+    assert os.path.getsize(path) > 0
+    os.remove(path)
+
+
+def test_pdf_generation_multiline_description():
+    """long descriptions that wrap into multiple lines should generate without error"""
+    long_desc = (
+        "for demonstrating exemplary dedication, extraordinary academic rigor, "
+        "and highest order professional performance during all stages of training for"
+    )
+    path = generate_certificate_pdf(
+        recipient_name="Walter Skinner",
+        course_name="Bureau Operations",
+        issuer_name="Department of Justice",
+        description=long_desc,
+        cert_id="test004",
+    )
+    assert os.path.exists(path)
+    assert os.path.getsize(path) > 0
+    os.remove(path)

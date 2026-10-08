@@ -38,6 +38,7 @@ class JobCreateRequest(BaseModel):
     recipients: list[RecipientInput]
     course_name: Optional[str] = "Certificate of Completion"
     issuer_name: Optional[str] = "Organization"
+    description: Optional[str] = "has successfully mastered all prescribed coursework and criteria for"
 
     @field_validator("recipients")
     @classmethod
@@ -72,6 +73,7 @@ class JobResponse(BaseModel):
     failed: int
     course_name: Optional[str]
     issuer_name: Optional[str]
+    description: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
