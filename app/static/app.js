@@ -99,9 +99,15 @@ const DOM = {
   modal: document.getElementById("pdf-preview-modal"),
   modalTitle: document.getElementById("modal-cert-title"),
   modalCertId: document.getElementById("modal-cert-id"),
-  modalIframe: document.getElementById("pdf-preview-iframe"),
   modalDirectDownload: document.getElementById("modal-direct-download"),
   btnCloseModal: document.getElementById("btn-close-modal"),
+  modalPreviewIssuer: document.getElementById("modal-preview-issuer"),
+  modalPreviewName: document.getElementById("modal-preview-name"),
+  modalPreviewDesc: document.getElementById("modal-preview-desc"),
+  modalPreviewCourse: document.getElementById("modal-preview-course"),
+  modalPreviewCertId: document.getElementById("modal-preview-cert-id"),
+  modalPreviewDate: document.getElementById("modal-preview-date"),
+  progressBarInnerText: document.getElementById("progress-bar-inner-text"),
 
   // Toast
   toastHost: document.getElementById("toast-host"),
@@ -700,14 +706,28 @@ function updateMonitorView(job) {
   DOM.metricRate.textContent = `${rate}%`;
 
   // Progress Bar
-  DOM.liquidProgressFill.style.width = `${percent}%`;
-  DOM.progressPercentVal.textContent = `${percent}%`;
-  DOM.progressStatusDesc.textContent =
-    job.status === "done"
-      ? "All certificates processed"
-      : job.status === "running"
-      ? `Processing certificates (${processed}/${total})...`
-      : `Queued in worker pool (${total} total)`;
+  if (job.status === "done") {
+    DOM.liquidProgressFill.style.width = "100%";
+    DOM.liquidProgressFill.classList.add("finished");
+    DOM.progressPercentVal.textContent = "Finished";
+    DOM.progressStatusDesc.textContent = "Finished — All certificates processed";
+    if (DOM.progressBarInnerText) DOM.progressBarInnerText.textContent = "FINISHED";
+  } else if (job.status === "failed") {
+    DOM.liquidProgressFill.classList.remove("finished");
+    DOM.liquidProgressFill.style.width = `${percent}%`;
+    DOM.progressPercentVal.textContent = "Failed";
+    DOM.progressStatusDesc.textContent = "Job failed during generation";
+    if (DOM.progressBarInnerText) DOM.progressBarInnerText.textContent = "";
+  } else {
+    DOM.liquidProgressFill.classList.remove("finished");
+    DOM.liquidProgressFill.style.width = `${percent}%`;
+    DOM.progressPercentVal.textContent = `${percent}%`;
+    DOM.progressStatusDesc.textContent =
+      job.status === "running"
+        ? `Processing certificates (${processed}/${total})...`
+        : `Queued in worker pool (${total} total)`;
+    if (DOM.progressBarInnerText) DOM.progressBarInnerText.textContent = "";
+  }
 
   // ZIP download button state
   DOM.btnDownloadZip.disabled = completed === 0;
@@ -890,10 +910,45 @@ async function loadJobHistory() {
 // MODAL PDF PREVIEW
 // ==========================================================================
 function openPdfPreview(certId, recipientName) {
-  const downloadUrl = `/api/certificates/${certId}/download`;
-  DOM.modalTitle.textContent = `${recipientName} — Certificate`;
+  let certObj = null;
+  if (typeof certId === "object" && certId !== null) {
+    certObj = certId;
+    certId = certObj.id;
+    recipientName = certObj.recipient_name;
+  } else if (state.activeJobData && state.activeJobData.certificates) {
+    certObj = state.activeJobData.certificates.find((c) => c.id === certId);
+  }
+
+  const job = state.activeJobData || {};
+  const recName = recipientName || certObj?.recipient_name || "Recipient";
+  const course = job.course_name || "Certificate of Completion";
+  const issuer = (job.issuer_name || "Global Tech Academy").toUpperCase();
+  const desc = job.description || "has successfully mastered all prescribed coursework and criteria for";
+
+  const certDate = certObj?.created_at || job.created_at;
+  const formattedDate = certDate
+    ? new Date(certDate).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+
+  DOM.modalTitle.textContent = `${recName} — Certificate`;
   DOM.modalCertId.textContent = `Certificate ID: ${certId}`;
-  DOM.modalIframe.src = downloadUrl;
+
+  if (DOM.modalPreviewName) DOM.modalPreviewName.textContent = recName;
+  if (DOM.modalPreviewCourse) DOM.modalPreviewCourse.textContent = course;
+  if (DOM.modalPreviewIssuer) DOM.modalPreviewIssuer.textContent = issuer;
+  if (DOM.modalPreviewDesc) DOM.modalPreviewDesc.textContent = desc;
+  if (DOM.modalPreviewCertId) DOM.modalPreviewCertId.textContent = `ID: ${certId}`;
+  if (DOM.modalPreviewDate) DOM.modalPreviewDate.textContent = `Date: ${formattedDate}`;
+
+  const downloadUrl = `/api/certificates/${certId}/download`;
   DOM.modalDirectDownload.href = downloadUrl;
   DOM.modalDirectDownload.setAttribute("download", `certificate_${certId}.pdf`);
 
@@ -902,7 +957,6 @@ function openPdfPreview(certId, recipientName) {
 
 function closeModal() {
   DOM.modal.classList.add("hidden");
-  DOM.modalIframe.src = "about:blank";
 }
 
 // ==========================================================================

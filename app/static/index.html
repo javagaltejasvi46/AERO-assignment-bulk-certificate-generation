@@ -408,6 +408,7 @@
               <div class="liquid-progress-track">
                 <div class="liquid-progress-fill" id="liquid-progress-fill" style="width: 0%;">
                   <div class="liquid-wave"></div>
+                  <span class="progress-bar-inner-text" id="progress-bar-inner-text">FINISHED</span>
                 </div>
               </div>
             </div>
@@ -701,15 +702,15 @@
     </main>
   </div>
 
-  <!-- PDF Preview Modal (Liquid Glass) -->
+  <!-- Certificate Visual Preview Modal (Liquid Glass) -->
   <div class="glass-modal-backdrop hidden" id="pdf-preview-modal">
     <div class="glass-modal-container">
       <div class="glass-modal-header">
         <div class="flex-align-center">
           <div class="card-icon-badge amber-glow" style="margin-right: 12px;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mini-icon">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
+              <circle cx="12" cy="8" r="7"/>
+              <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
             </svg>
           </div>
           <div>
@@ -729,8 +730,45 @@
         </div>
       </div>
 
-      <div class="glass-modal-body">
-        <iframe id="pdf-preview-iframe" src="about:blank" title="Certificate PDF Viewer"></iframe>
+      <div class="glass-modal-body modal-cert-body">
+        <div class="cert-mockup-frame modal-cert-frame">
+          <div class="cert-mockup-inner modal-cert-inner">
+            <div class="cert-decor-corner tl"></div>
+            <div class="cert-decor-corner tr"></div>
+            <div class="cert-decor-corner bl"></div>
+            <div class="cert-decor-corner br"></div>
+
+            <div class="cert-preview-issuer" id="modal-preview-issuer">GLOBAL TECH ACADEMY</div>
+            <div class="cert-preview-header">CERTIFICATE OF ACHIEVEMENT</div>
+            <div class="cert-preview-sub">THIS PROUDLY CERTIFIES THAT</div>
+
+            <div class="cert-preview-name" id="modal-preview-name">Alice Johnson</div>
+            <div class="cert-preview-rule"></div>
+
+            <div class="cert-preview-desc" id="modal-preview-desc">has successfully mastered all prescribed coursework and criteria for</div>
+            <div class="cert-preview-course" id="modal-preview-course">Certificate of Completion</div>
+
+            <div class="cert-preview-footer">
+              <div class="cert-preview-signature">
+                <div class="sig-line"></div>
+                <span class="sig-title">Authorized Registrar</span>
+              </div>
+
+              <div class="cert-preview-seal">
+                <div class="seal-inner">
+                  <span class="seal-star">★</span>
+                  <span class="seal-text">OFFICIAL</span>
+                  <span class="seal-star">★</span>
+                </div>
+              </div>
+
+              <div class="cert-preview-meta">
+                <span class="cert-id-preview" id="modal-preview-cert-id">ID: 89dfd4c44c58</span>
+                <span class="cert-date-preview" id="modal-preview-date">Date: October 08, 2026</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
