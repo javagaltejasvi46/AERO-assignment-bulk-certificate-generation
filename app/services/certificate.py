@@ -3,6 +3,7 @@ Certificate PDF generation service using ReportLab canvas drawing.
 """
 
 import os
+import math
 from datetime import datetime
 
 from reportlab.lib.pagesizes import landscape, A4
@@ -49,6 +50,96 @@ def _draw_decorative_corners(c, width, height):
         c.rotate(45)
         c.rect(-diamond_size, -diamond_size, diamond_size * 2, diamond_size * 2, fill=True, stroke=False)
         c.restoreState()
+
+
+def _draw_star(c, cx, cy, r_outer, r_inner, points=5):
+    """Draws a star polygon at center (cx, cy)."""
+    p = c.beginPath()
+    angle = -math.pi / 2
+    step = math.pi / points
+    for i in range(points * 2):
+        r = r_outer if i % 2 == 0 else r_inner
+        x = cx + r * math.cos(angle)
+        y = cy + r * math.sin(angle)
+        if i == 0:
+            p.moveTo(x, y)
+        else:
+            p.lineTo(x, y)
+        angle += step
+    p.close()
+    c.drawPath(p, fill=1, stroke=0)
+
+
+def _draw_seal(c, center_x, seal_y, radius=32):
+    """Draws official gold seal with ribbon tails, serrated rim, dashed ring, and stars."""
+    c.saveState()
+
+    # Ribbon tails
+    c.setFillColor(HexColor("#1a3c5e"))
+    c.setStrokeColor(HexColor("#0f243a"))
+    c.setLineWidth(0.5)
+
+    p_left = c.beginPath()
+    p_left.moveTo(center_x - 14, seal_y - 10)
+    p_left.lineTo(center_x - 24, seal_y - 48)
+    p_left.lineTo(center_x - 14, seal_y - 40)
+    p_left.lineTo(center_x - 4, seal_y - 48)
+    p_left.lineTo(center_x - 4, seal_y - 10)
+    p_left.close()
+    c.drawPath(p_left, fill=1, stroke=1)
+
+    p_right = c.beginPath()
+    p_right.moveTo(center_x + 4, seal_y - 10)
+    p_right.lineTo(center_x + 4, seal_y - 48)
+    p_right.lineTo(center_x + 14, seal_y - 40)
+    p_right.lineTo(center_x + 24, seal_y - 48)
+    p_right.lineTo(center_x + 14, seal_y - 10)
+    p_right.close()
+    c.drawPath(p_right, fill=1, stroke=1)
+
+    # Serrated outer gold ring
+    c.setFillColor(HexColor("#d97706"))
+    p_serr = c.beginPath()
+    num_points = 36
+    for i in range(num_points * 2):
+        r = (radius + 3) if i % 2 == 0 else (radius - 1)
+        angle = i * (math.pi / num_points)
+        x = center_x + r * math.cos(angle)
+        y = seal_y + r * math.sin(angle)
+        if i == 0:
+            p_serr.moveTo(x, y)
+        else:
+            p_serr.lineTo(x, y)
+    p_serr.close()
+    c.drawPath(p_serr, fill=1, stroke=0)
+
+    # Concentric gold medal circles
+    c.setFillColor(HexColor("#f59e0b"))
+    c.circle(center_x, seal_y, radius, fill=1, stroke=0)
+
+    c.setFillColor(HexColor("#b45309"))
+    c.circle(center_x, seal_y, radius - 4, fill=1, stroke=0)
+
+    c.setFillColor(HexColor("#d97706"))
+    c.circle(center_x, seal_y, radius - 6, fill=1, stroke=0)
+
+    # Dashed inner ring
+    c.setStrokeColor(HexColor("#fef3c7"))
+    c.setLineWidth(1.2)
+    c.setDash(2, 2)
+    c.circle(center_x, seal_y, radius - 7, fill=0, stroke=1)
+    c.setDash()
+
+    # Stars and OFFICIAL text
+    c.setFillColor(HexColor("#ffffff"))
+    _draw_star(c, center_x, seal_y + 11, 4.5, 2.0)
+
+    c.setFont("Helvetica-Bold", 7.5)
+    c.drawCentredString(center_x, seal_y - 2.5, "OFFICIAL")
+
+    _draw_star(c, center_x, seal_y - 14, 4.5, 2.0)
+
+    c.restoreState()
 
 
 def generate_certificate_pdf(
@@ -142,6 +233,9 @@ def generate_certificate_pdf(
     c.setFont("Helvetica", 11)
     c.setFillColor(HexColor("#333333"))
     c.drawCentredString(center_x + 2.5 * inch, bottom_y, issuer_name)
+
+    # Official gold seal badge in the center
+    _draw_seal(c, center_x, bottom_y + 0.22 * inch)
 
     # -- certificate ID at the very bottom (for reference) --
     c.setFont("Helvetica", 7)

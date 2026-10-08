@@ -293,18 +293,19 @@ def test_download_nonexistent_cert(client):
 
 def test_download_pending_cert_fails(client):
     """can't download a cert that hasn't been generated yet"""
-    resp = client.post("/api/jobs", json={
-        "recipients": [{"name": "Pending Person"}],
-    })
-    job_id = resp.json()["job_id"]
+    with patch("app.main.process_generation_job"):
+        resp = client.post("/api/jobs", json={
+            "recipients": [{"name": "Pending Person"}],
+        })
+        job_id = resp.json()["job_id"]
 
-    # grab the cert immediately before generation finishes
-    certs = client.get(f"/api/jobs/{job_id}/certificates").json()
-    # cert might already be done if generation is fast, so we check
-    if certs and certs[0]["status"] == "pending":
+        certs = client.get(f"/api/jobs/{job_id}/certificates").json()
+        assert len(certs) == 1
+        assert certs[0]["status"] == "pending"
         cert_id = certs[0]["id"]
         download_resp = client.get(f"/api/certificates/{cert_id}/download")
         assert download_resp.status_code == 400
+        assert "not available" in download_resp.json()["detail"]
 
 
 def test_download_all_as_zip(client):
